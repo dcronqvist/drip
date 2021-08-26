@@ -2,6 +2,10 @@ import argparse
 
 
 def prompt_drip():
+    """
+    Should be called when `drip` is called interactively.
+    """
+
     out = """drip, the language."""
     print(out)
 
