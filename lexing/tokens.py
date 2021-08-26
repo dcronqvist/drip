@@ -24,6 +24,6 @@ class Token:
 
     def __repr__(self) -> str:
         if self.value:
-            return f'<{self.token_type}, {self.value}>'
+            return f'<{self.token_type.value}, {self.value}>'
         else:
             return f'<{self.token_type}>'
