@@ -7,6 +7,13 @@ class SourcePosition:
         self.file_name = file_name
         self.char = None
 
+    def set_position(self, line: int, column: int, index: int):
+        self.line = line
+        self.column = column
+        self.index = index
+        self.char = self.source[index] if index < len(self.source) else None
+        return self
+
     def advance(self) -> str:
         """
         Advances the position by one character in the source and returns the character.
@@ -26,3 +33,7 @@ class SourcePosition:
         """
 
         return self.source[self.index - 1]
+
+    def copy(self):
+        return SourcePosition(self.source, self.file_name).set_position(self.line, self.column, self.index)
+
