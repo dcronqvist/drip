@@ -1,4 +1,6 @@
 import argparse
+from lexing.source_pos import SourcePosition
+from errors.error import Error
 
 
 def prompt_drip():
@@ -33,9 +35,15 @@ def run_interactive():
 
 if __name__ == "__main__":
     args = parse_args()
-    if args.file:
-        with open(args.file, "r") as f:
-            source = f.read()
-        execute_script(source, args.file)
-    else:
-        run_interactive()
+
+    source = "var x = 128.2 . 2"
+    err = Error("SyntaxError", 2, SourcePosition(source, "<shell>").set_position(1, 14, 14), SourcePosition(source, "<shell>").set_position(1, 14, 14), "Invalid operator '.'")
+
+    print(err)
+
+    # if args.file:
+    #     with open(args.file, "r") as f:
+    #         source = f.read()
+    #     execute_script(source, args.file)
+    # else:
+    #     run_interactive()
