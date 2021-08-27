@@ -8,6 +8,8 @@ class TokenType(Enum):
     STAR = "*"
     SLASH = "/"
     PERCENT = "%"
+    POW = "^"
+
     LPAREN = "("
     RPAREN = ")"
     LBRACKET = "["
@@ -27,8 +29,7 @@ class TokenType(Enum):
     LESS_THAN_EQUAL = "<="
 
     # Literal values.
-    INTEGER = "INT"
-    FLOAT = "FLOAT"
+    NUMBER = "NUMBER"
     STRING = "STRING"
 
     # Identifiers

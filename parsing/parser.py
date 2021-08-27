@@ -66,13 +66,15 @@ class Parser:
         if error:
             return None, error
 
-        if self.match_oneof([TokenType.STAR, TokenType.SLASH]):
+        if self.match_oneof([TokenType.STAR, TokenType.SLASH, TokenType.POW, TokenType.PERCENT]):
             operator = self.previous()
             right, error = self.unary()
             if error:
                 return None, error
 
             unary = BinaryExpression(unary.start_pos.copy(), right.end_pos.copy(), unary, operator, right)
+        else:
+            return None, SyntaxError(self.current_token.start_pos.regress(), self.current_token.end_pos.regress(), f"Expected '*' or '/' but found '{self.current_token.token_type.value}'")
 
         return unary, None
 
@@ -98,7 +100,7 @@ class Parser:
                 return None, error
             return GroupedExpression(expr.start_pos.copy(), expr.end_pos.copy(), expr), None
 
-        if self.match_oneof([TokenType.INTEGER, TokenType.FLOAT, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NULL]):
+        if self.match_oneof([TokenType.NUMBER, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NULL]):
             prev = self.previous()
             return LiteralExpression(prev.start_pos.copy(), prev.end_pos.set_position(prev.end_pos.line, prev.end_pos.column, prev.end_pos.index).copy(), prev), None
         else:

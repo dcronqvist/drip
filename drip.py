@@ -41,7 +41,6 @@ def execute_script(source: str, file_name: str):
         print(error)
         return
 
-    print(tokens)
     print(result.value)
 
 

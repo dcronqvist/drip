@@ -19,6 +19,9 @@ class ValueNode:
     def slash(self, other: ValueNode) -> ValueNode:
         return None
 
+    def pow(self, other: ValueNode) -> ValueNode:
+        return None
+
     def percent(self, other: ValueNode) -> ValueNode:
         return None
 
@@ -49,70 +52,55 @@ class ValueNode:
     def notnot(self: ValueNode) -> ValueNode:
         return None
 
-
-class Float(ValueNode):
+class String(ValueNode):
     def __init__(self, value):
         super().__init__(value)
 
     def plus(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, Integer):
-            return Integer(self.value + other.value)
-        elif isinstance(other, Float):
-            return Float(self.value + other.value)
-
+        if isinstance(other, String):
+            return String(self.value + other.value)
         return None
 
     def minus(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, Integer):
-            return Integer(self.value - other.value)
-        elif isinstance(other, Float):
-            return Float(self.value - other.value)
-
         return None
 
     def star(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, Integer):
-            return Integer(self.value * other.value)
-        elif isinstance(other, Float):
-            return Float(self.value * other.value)
-        
+        if isinstance(other, Number):
+            return String(self.value * other.value)
         return None
 
-    def slash(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, (Integer, Float)):
-            return Float(self.value / other.value)
-
-
-class Integer(ValueNode):
+class Number(ValueNode):
     def __init__(self, value):
         super().__init__(value)
 
     def plus(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, Integer):
-            return Integer(self.value + other.value)
-        elif isinstance(other, Float):
-            return Float(self.value + other.value)
+        if isinstance(other, Number):
+            return Number(self.value + other.value)
 
         return None
 
     def minus(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, Integer):
-            return Integer(self.value - other.value)
-        elif isinstance(other, Float):
-            return Float(self.value - other.value)
+        if isinstance(other, Number):
+            return Number(self.value - other.value)
 
         return None
 
     def star(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, Integer):
-            return Integer(self.value * other.value)
-        elif isinstance(other, Float):
-            return Float(self.value * other.value)
+        if isinstance(other, Number):
+            return Number(self.value * other.value)
+        elif isinstance(other, String):
+            return String(self.value * other.value)
         
         return None
 
     def slash(self, other: ValueNode) -> ValueNode:
-        if isinstance(other, (Integer, Float)):
-            return Float(self.value / other.value)
+        if isinstance(other, Number):
+            return Number(self.value / other.value)
 
-        return None
+    def percent(self, other: ValueNode) -> ValueNode:
+        if isinstance(other, Number):
+            return Number(self.value % other.value)
+
+    def pow(self, other: ValueNode) -> ValueNode:
+        if isinstance(other, Number):
+            return Number(self.value ** other.value)

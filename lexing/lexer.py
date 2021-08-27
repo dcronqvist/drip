@@ -42,10 +42,6 @@ class Lexer:
         return False
 
     def make_number(self) -> Tuple[Token, Error]:
-        """
-        Returns either a FLOAT or INTEGER token.
-        In the case of too many dots (> 1), an error is returned.
-        """
         start_position = self.position.copy()
 
         number = ""
@@ -61,9 +57,9 @@ class Lexer:
             self.position.advance()
 
         if dots == 0:
-            return Token(TokenType.INTEGER, start_position, self.position.copy(), value=int(number)), None
+            return Token(TokenType.NUMBER, start_position, self.position.copy(), value=int(number)), None
         elif dots == 1:
-            return Token(TokenType.FLOAT, start_position, self.position.copy(), value=float(number)), None
+            return Token(TokenType.NUMBER, start_position, self.position.copy(), value=float(number)), None
 
         return None, SyntaxError(start_position, self.position.copy(), f"Invalid number format: {number}")
 
@@ -139,6 +135,9 @@ class Lexer:
 
         elif self.match(":"):
             return Token(TokenType.COLON, self.position.copy(), self.position.copy()), None
+
+        elif self.match("^"):
+            return Token(TokenType.POW, self.position.copy(), self.position.copy()), None
 
         elif self.match("="):
             if self.match("="):
