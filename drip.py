@@ -36,14 +36,9 @@ def run_interactive():
 if __name__ == "__main__":
     args = parse_args()
 
-    source = "var x = 128.2 . 2"
-    err = Error("SyntaxError", 2, SourcePosition(source, "<shell>").set_position(1, 14, 14), SourcePosition(source, "<shell>").set_position(1, 14, 14), "Invalid operator '.'")
-
-    print(err)
-
-    # if args.file:
-    #     with open(args.file, "r") as f:
-    #         source = f.read()
-    #     execute_script(source, args.file)
-    # else:
-    #     run_interactive()
+    if args.file:
+        with open(args.file, "r") as f:
+            source = f.read()
+        execute_script(source, args.file)
+    else:
+        run_interactive()
