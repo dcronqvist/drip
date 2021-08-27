@@ -25,3 +25,7 @@ class Error:
 
     def __repr__(self) -> str:
         return f"{self.error_name} @ line {self.start_pos.line}, column {self.start_pos.column} in {self.start_pos.file_name}: {self.message}\n\n{self.arrows_below_error()}"
+
+class SyntaxError(Error):
+    def __init__(self, start_pos: SourcePosition, end_pos: SourcePosition, message: str):
+        super().__init__("SyntaxError", 1, start_pos, end_pos, message)
