@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 class SourcePosition:
     def __init__(self, source:str, file_name: str):
         self.line = 1
@@ -15,7 +17,19 @@ class SourcePosition:
         self.char = self.source[index] if index < len(self.source) else None
         return self
 
-    def advance(self) -> str:
+    def regress(self) -> SourcePosition:
+        self.column -= 1
+        if self.column < 0:
+            self.line -= 1
+            self.column = 0
+        
+        self.index -= 1
+        if self.index < 0:
+            self.char = self.source[self.index]
+
+        return self
+
+    def advance(self) -> SourcePosition:
         """
         Advances the position by one character in the source and returns the character.
         """
@@ -26,7 +40,7 @@ class SourcePosition:
             self.char = self.source[self.index]
         else:
             self.char = None
-        return self.char
+        return self
 
     def previous(self) -> str:
         """

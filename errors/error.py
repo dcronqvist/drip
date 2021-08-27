@@ -18,7 +18,7 @@ class Error:
         after = self.start_pos.source[self.end_pos.index + 1:min(self.end_pos.index + characters_around, len(self.start_pos.source))]
 
         line_of_code = before + part_of_code + after
-        below = ' ' * len(before) + '^' * len(part_of_code) + ' ' * len(after)
+        below = ' ' * len(before) + '^' * max(len(part_of_code), 1) + ' ' * len(after)
 
         return f"  {line_of_code}\n  {below}"
         
@@ -29,3 +29,7 @@ class Error:
 class SyntaxError(Error):
     def __init__(self, start_pos: SourcePosition, end_pos: SourcePosition, message: str):
         super().__init__("SyntaxError", 1, start_pos, end_pos, message)
+
+class RuntimeError(Error):
+    def __init__(self, start_pos: SourcePosition, end_pos: SourcePosition, message: str):
+        super().__init__("RuntimeError", 2, start_pos, end_pos, message)

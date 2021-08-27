@@ -7,13 +7,40 @@ class TokenType(Enum):
     MINUS = "-"
     STAR = "*"
     SLASH = "/"
-    BANG = "!"
+    PERCENT = "%"
+    LPAREN = "("
+    RPAREN = ")"
+    LBRACKET = "["
+    RBRACKET = "]"
+    LBRACE = "{"
+    RBRACE = "}"
+    SEMICOLON = ";"
+    COLON = ":"
+    EQUALS = "="
+
+    # Two-character tokens.
+    EQUAL_EQUAL = "=="
+    NOT_EQUAL = "!="
+    GREATER_THAN = ">"
+    LESS_THAN = "<"
+    GREATER_THAN_EQUAL = ">="
+    LESS_THAN_EQUAL = "<="
 
     # Literal values.
     INTEGER = "INT"
     FLOAT = "FLOAT"
     STRING = "STRING"
-    BOOLEAN = "BOOL"
+
+    # Identifiers
+    IDENTIFIER = "IDENTIFIER"
+
+    # Keywords
+    AND = "AND"
+    OR = "OR"
+    NOT = "NOT"
+    TRUE = "TRUE"
+    FALSE = "FALSE"
+    NULL = "NULL"
 
     # End of file.
     EOF = 'EOF'
@@ -27,6 +54,6 @@ class Token:
 
     def __repr__(self) -> str:
         if self.value:
-            return f'<{self.token_type.value}, {self.value}>'
+            return f'<{self.token_type.value}:{self.value}>'
         else:
             return f'<{self.token_type.value}>'

@@ -1,4 +1,6 @@
 import argparse
+from interpreting.interpreter import Interpreter
+from parsing.parser import Parser
 from lexing.lexer import Lexer
 from lexing.source_pos import SourcePosition
 from errors.error import Error
@@ -27,7 +29,21 @@ def execute_script(source: str, file_name: str):
         print(error)
         return
 
+    parser = Parser(tokens)
+    expr, error = parser.parse()
+    if error:
+        print(error)
+        return
+
+    interpreter = Interpreter(expr)
+    result, error = interpreter.interpret()
+    if error:
+        print(error)
+        return
+
     print(tokens)
+    print(result.value)
+
 
 
 
