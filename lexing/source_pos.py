@@ -6,6 +6,7 @@ class SourcePosition:
         self.source = source
         self.file_name = file_name
         self.char = None
+        self.advance()
 
     def set_position(self, line: int, column: int, index: int):
         self.line = line
@@ -21,10 +22,10 @@ class SourcePosition:
 
         self.column += 1
         self.index += 1
-        if self.index > len(self.source):
-            self.char = None
-        else:
+        if self.index < len(self.source):
             self.char = self.source[self.index]
+        else:
+            self.char = None
         return self.char
 
     def previous(self) -> str:

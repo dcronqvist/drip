@@ -1,4 +1,5 @@
 import argparse
+from lexing.lexer import Lexer
 from lexing.source_pos import SourcePosition
 from errors.error import Error
 
@@ -19,7 +20,15 @@ def parse_args():
 
 
 def execute_script(source: str, file_name: str):
-    print(f"Running the script {file_name}, with source {source}.")
+    lexer = Lexer(source, file_name)
+    tokens, error = lexer.tokenize()
+
+    if error:
+        print(error)
+        return
+
+    print(tokens)
+
 
 
 def run_interactive():
