@@ -11,12 +11,12 @@ class Lexer:
         self.digits = "0123456789"
         self.alphanumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
         self.keywords = {
-            "and": TokenType.AND,
-            "or": TokenType.OR,
-            "not": TokenType.NOT,
-            "true": TokenType.TRUE,
-            "false": TokenType.FALSE,
-            "null": TokenType.NULL,
+            "and": (TokenType.AND, None),
+            "or": (TokenType.OR, None),
+            "not": (TokenType.NOT, None),
+            "true": (TokenType.BOOLEAN, True),
+            "false": (TokenType.BOOLEAN, False),
+            "null": (TokenType.NULL, None),
         }
 
     def consume(self, expected: str, message: str = None) -> Error:
@@ -87,9 +87,11 @@ class Lexer:
             self.position.advance()
 
         if s in self.keywords:
-            return Token(self.keywords[s], start_position, self.position.copy()), None
+            tt, val = self.keywords[s]
 
-        return Token(TokenType.IDENTIFIER, start_position, self.position.copy(), value=s), None
+            return Token(tt, start_position, self.position.regress().copy(), value=val), None
+
+        return Token(TokenType.IDENTIFIER, start_position, self.position.regress().copy(), value=s), None
 
     def make_token(self) -> Tuple[Token, Error]:
         if self.position.char in self.digits:

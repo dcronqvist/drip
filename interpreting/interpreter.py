@@ -1,7 +1,7 @@
 from typing import Tuple
-from interpreting.values import Number, ValueNode
+from interpreting.values import Boolean, Number, String, ValueNode
 from lexing.tokens import TokenType
-from parsing.expressions import BinaryExpression, Expression, GroupedExpression, LiteralExpression
+from parsing.expressions import BinaryExpression, Expression, GroupedExpression, LiteralExpression, UnaryExpression
 from errors.error import Error, RuntimeError
 
 class Interpreter:
@@ -23,6 +23,11 @@ class Interpreter:
     def visit_LiteralExpression(self, expression: LiteralExpression) -> Tuple[ValueNode, Error]:
         if expression.literal.token_type == TokenType.NUMBER:
             return Number(expression.literal.value), None
+        elif expression.literal.token_type == TokenType.STRING:
+            return String(expression.literal.value), None
+        elif expression.literal.token_type == TokenType.BOOLEAN:
+            return Boolean(expression.literal.value), None
+        
         return None, RuntimeError(expression.start_pos, expression.end_pos, f"No visitor method for literal {expression.literal.token_type}")
 
     def visit_BinaryExpression(self, expression: BinaryExpression) -> Tuple[ValueNode, Error]:
@@ -65,6 +70,23 @@ class Interpreter:
             return None, RuntimeError(expression.start_pos, expression.end_pos, f"Invalid operation {expression.operator.token_type.value} between types {left.__class__.__name__} and {right.__class__.__name__}")
         else:
             return result, None
+
+    def visit_UnaryExpression(self, expression: UnaryExpression) -> Tuple[ValueNode, Error]:
+        value, error = self.visit(expression.right)
+        if error:
+            return None, error
+
+        result = None
+        if expression.operator.token_type == TokenType.MINUS:
+            result = value.negate()
+        elif expression.operator.token_type == TokenType.NOT:
+            result = value.notnot()
+
+        if not result:
+            return None, RuntimeError(expression.start_pos, expression.end_pos, f"Invalid operation {expression.operator.token_type.value} on type {value.__class__.__name__}")
+        else:
+            return result, None
+
 
     def visit_GroupedExpression(self, expression: GroupedExpression) -> Tuple[ValueNode, Error]:
         return self.visit(expression.expression)

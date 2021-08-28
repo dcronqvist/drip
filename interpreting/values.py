@@ -13,6 +13,9 @@ class ValueNode:
     def minus(self, other: ValueNode) -> ValueNode:
         return None
 
+    def negate(self) -> ValueNode:
+        return None
+
     def star(self, other: ValueNode) -> ValueNode:
         return None
 
@@ -52,6 +55,9 @@ class ValueNode:
     def notnot(self: ValueNode) -> ValueNode:
         return None
 
+    def __repr__(self: ValueNode) -> str:
+        return str(self.value).lower()
+
 class String(ValueNode):
     def __init__(self, value):
         super().__init__(value)
@@ -68,6 +74,17 @@ class String(ValueNode):
         if isinstance(other, Number):
             return String(self.value * other.value)
         return None
+
+    def __repr__(self: ValueNode) -> str:
+        return self.value
+
+
+class Boolean(ValueNode):
+    def __init__(self, value):
+        super().__init__(value)
+
+    def __repr__(self: ValueNode) -> str:
+        return str(self.value).lower()
 
 class Number(ValueNode):
     def __init__(self, value):
@@ -104,3 +121,6 @@ class Number(ValueNode):
     def pow(self, other: ValueNode) -> ValueNode:
         if isinstance(other, Number):
             return Number(self.value ** other.value)
+
+    def __repr__(self: ValueNode) -> str:
+        return str(self.value)

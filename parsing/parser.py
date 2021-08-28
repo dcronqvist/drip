@@ -25,6 +25,19 @@ class Parser:
         if not self.match(token_type):
             if not message:
                 return SyntaxError(self.current_token.start_pos, self.current_token.end_pos, f"Expected '{token_type.value}' but found '{self.current_token.value}'")
+            else:
+                return SyntaxError(self.current_token.start_pos, self.current_token.end_pos, message)
+        else:
+            return None
+
+    def consume_oneof(self, token_types: List[TokenType], message: str = None) -> Error:
+        if not self.match_oneof(token_types):
+            if not message:
+                return SyntaxError(self.current_token.start_pos, self.current_token.end_pos, f"Expected one of '{', '.join([t.value for t in token_types])}' but found '{self.current_token.token_type.value.lower()}'")
+            else:
+                return SyntaxError(self.current_token.start_pos, self.current_token.end_pos, message)
+        else:
+            return None
 
     def match(self, token_type: TokenType) -> bool:
         if self.current_token != None and self.current_token.token_type == token_type:
@@ -66,15 +79,23 @@ class Parser:
         if error:
             return None, error
 
-        if self.match_oneof([TokenType.STAR, TokenType.SLASH, TokenType.POW, TokenType.PERCENT]):
+
+        factor_operators = [
+            TokenType.STAR,
+            TokenType.SLASH,
+            TokenType.PERCENT,
+            TokenType.POW,
+            TokenType.AND,
+            TokenType.OR,
+        ]
+
+        if self.match_oneof(factor_operators):
             operator = self.previous()
             right, error = self.unary()
             if error:
                 return None, error
 
             unary = BinaryExpression(unary.start_pos.copy(), right.end_pos.copy(), unary, operator, right)
-        else:
-            return None, SyntaxError(self.current_token.start_pos.regress(), self.current_token.end_pos.regress(), f"Expected '*' or '/' but found '{self.current_token.token_type.value}'")
 
         return unary, None
 
@@ -100,7 +121,7 @@ class Parser:
                 return None, error
             return GroupedExpression(expr.start_pos.copy(), expr.end_pos.copy(), expr), None
 
-        if self.match_oneof([TokenType.NUMBER, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NULL]):
+        if self.match_oneof([TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN, TokenType.NULL]):
             prev = self.previous()
             return LiteralExpression(prev.start_pos.copy(), prev.end_pos.set_position(prev.end_pos.line, prev.end_pos.column, prev.end_pos.index).copy(), prev), None
         else:

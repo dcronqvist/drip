@@ -41,7 +41,7 @@ def execute_script(source: str, file_name: str):
         print(error)
         return
 
-    print(result.value)
+    print(result)
 
 
 

@@ -31,6 +31,7 @@ class TokenType(Enum):
     # Literal values.
     NUMBER = "NUMBER"
     STRING = "STRING"
+    BOOLEAN = "BOOLEAN"
 
     # Identifiers
     IDENTIFIER = "IDENTIFIER"
