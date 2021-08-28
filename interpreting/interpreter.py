@@ -65,8 +65,13 @@ class Interpreter:
             result = left.lt(right)
         elif expression.operator.token_type == TokenType.LESS_THAN_EQUAL:
             result = left.lte(right)
+        elif expression.operator.token_type == TokenType.AND:
+            result = left.andand(right)
+        elif expression.operator.token_type == TokenType.OR:
+            result = left.oror(right)
 
-        if not result:
+
+        if result == None:
             return None, RuntimeError(expression.start_pos, expression.end_pos, f"Invalid operation {expression.operator.token_type.value} between types {left.__class__.__name__} and {right.__class__.__name__}")
         else:
             return result, None
@@ -82,7 +87,7 @@ class Interpreter:
         elif expression.operator.token_type == TokenType.NOT:
             result = value.notnot()
 
-        if not result:
+        if result == None:
             return None, RuntimeError(expression.start_pos, expression.end_pos, f"Invalid operation {expression.operator.token_type.value} on type {value.__class__.__name__}")
         else:
             return result, None

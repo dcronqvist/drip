@@ -86,12 +86,14 @@ class Lexer:
             s += self.position.char
             self.position.advance()
 
+        end_pos = self.position.copy().regress()
+
         if s in self.keywords:
             tt, val = self.keywords[s]
 
-            return Token(tt, start_position, self.position.regress().copy(), value=val), None
+            return Token(tt, start_position, end_pos, value=val), None
 
-        return Token(TokenType.IDENTIFIER, start_position, self.position.regress().copy(), value=s), None
+        return Token(TokenType.IDENTIFIER, start_position, end_pos, value=s), None
 
     def make_token(self) -> Tuple[Token, Error]:
         if self.position.char in self.digits:
@@ -141,11 +143,27 @@ class Lexer:
         elif self.match("^"):
             return Token(TokenType.POW, self.position.copy(), self.position.copy()), None
 
+        elif self.match("<"):
+            if self.match("="):
+                return Token(TokenType.LESS_THAN_EQUAL, self.position.copy(), self.position.copy()), None
+            return Token(TokenType.LESS_THAN, self.position.copy(), self.position.copy()), None
+
+        elif self.match(">"):
+            if self.match("="):
+                return Token(TokenType.GREATER_THAN_EQUAL, self.position.copy(), self.position.copy()), None
+            return Token(TokenType.GREATER_THAN, self.position.copy(), self.position.copy()), None
+
         elif self.match("="):
             if self.match("="):
                 return Token(TokenType.EQUAL_EQUAL, self.position.copy(), self.position.copy()), None
             else:
                 return Token(TokenType.EQUALS, self.position.copy(), self.position.copy()), None
+        
+        elif self.match("!"):
+            if self.match("="):
+                return Token(TokenType.NOT_EQUAL, self.position.copy(), self.position.copy()), None
+            else:
+                return None, SyntaxError(self.position.copy(), self.position.copy(), "Expected !=")
 
         elif self.position.char in ["'", '"']:
             return self.make_string(self.position.char)

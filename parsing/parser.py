@@ -58,7 +58,36 @@ class Parser:
         return self.expression()
 
     def expression(self) -> Tuple[Expression, Error]:
-        return self.term()
+        return self.equality()
+
+    def equality(self) -> Tuple[Expression, Error]:
+        left, error = self.comparison()
+        if error:
+            return None, error
+
+        if self.match_oneof([TokenType.EQUAL_EQUAL, TokenType.NOT_EQUAL]):
+            operator = self.previous()
+            right, error = self.comparison()
+            if error:
+                return None, error
+            return BinaryExpression(left.start_pos.copy(), right.end_pos.copy(), left, operator, right), None
+
+        return left, None
+
+    def comparison(self) -> Tuple[Expression, Error]:
+        left, error = self.term()
+        if error:
+            return None, error
+
+        if self.match_oneof([TokenType.EQUAL_EQUAL, TokenType.NOT_EQUAL, TokenType.LESS_THAN, TokenType.LESS_THAN_EQUAL, TokenType.GREATER_THAN, TokenType.GREATER_THAN_EQUAL, TokenType.AND, TokenType.OR]):
+            operator = self.previous()
+            right, error = self.term()
+            if error:
+                return None, error
+
+            return BinaryExpression(left.start_pos.copy(), right.end_pos.copy(), left, operator, right), None
+
+        return left, None
 
     def term(self) -> Tuple[Expression, Error]:
         factor, error = self.factor()
@@ -75,7 +104,7 @@ class Parser:
         return factor, None
 
     def factor(self) -> Tuple[Expression, Error]:
-        unary, error = self.unary()
+        unary, error = self.exponents()
         if error:
             return None, error
 
@@ -84,20 +113,33 @@ class Parser:
             TokenType.STAR,
             TokenType.SLASH,
             TokenType.PERCENT,
-            TokenType.POW,
-            TokenType.AND,
-            TokenType.OR,
+            TokenType.POW
         ]
 
         if self.match_oneof(factor_operators):
             operator = self.previous()
-            right, error = self.unary()
+            right, error = self.exponents()
             if error:
                 return None, error
 
             unary = BinaryExpression(unary.start_pos.copy(), right.end_pos.copy(), unary, operator, right)
 
         return unary, None
+
+    def exponents(self) -> Tuple[Expression, Error]:
+        left, error = self.unary()
+        if error:
+            return None, error
+
+        if self.match_oneof([TokenType.POW]):
+            operator = self.previous()
+            right, error = self.unary()
+            if error:
+                return None, error
+
+            return BinaryExpression(left.start_pos.copy(), right.end_pos.copy(), left, operator, right), None
+
+        return left, None
 
     def unary(self) -> Tuple[Expression, Error]:
         if self.match_oneof([TokenType.NOT, TokenType.MINUS]):

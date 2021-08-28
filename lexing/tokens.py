@@ -19,12 +19,12 @@ class TokenType(Enum):
     SEMICOLON = ";"
     COLON = ":"
     EQUALS = "="
+    GREATER_THAN = ">"
+    LESS_THAN = "<"
 
     # Two-character tokens.
     EQUAL_EQUAL = "=="
     NOT_EQUAL = "!="
-    GREATER_THAN = ">"
-    LESS_THAN = "<"
     GREATER_THAN_EQUAL = ">="
     LESS_THAN_EQUAL = "<="
 
