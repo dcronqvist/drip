@@ -188,4 +188,6 @@ class Lexer:
 
             tokens.append(token)
 
+        tokens.append(Token(TokenType.EOF, self.position.copy(), self.position.copy()))
+
         return tokens, None

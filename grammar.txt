@@ -1,6 +1,6 @@
 program        → statement* EOF ;
 
-statement      → expression ;
+statement      → expression ";" ;
 
 expression     → equality ;
 

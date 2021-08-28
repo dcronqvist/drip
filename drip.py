@@ -35,8 +35,8 @@ def execute_script(source: str, file_name: str):
         print(error)
         return
 
-    interpreter = Interpreter(expr)
-    result, error = interpreter.interpret()
+    interpreter = Interpreter()
+    result, error = interpreter.interpret(expr)
     if error:
         print(error)
         return
@@ -48,10 +48,29 @@ def execute_script(source: str, file_name: str):
 
 def run_interactive():
     prompt_drip()
+    interpreter = Interpreter()
     while True:
         try:
             source = input("> ")
-            execute_script(source, "<shell>")
+            lexer = Lexer(source, "<shell>")
+            tokens, error = lexer.tokenize()
+
+            if error:
+                print(error)
+                return
+
+            parser = Parser(tokens)
+            expr, error = parser.parse()
+            if error:
+                print(error)
+                return
+
+            result, error = interpreter.interpret(expr)
+            if error:
+                print(error)
+                return
+
+            print(result)
         except KeyboardInterrupt as e:
             print("")
             exit(0)

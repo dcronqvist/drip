@@ -1,5 +1,6 @@
+from interpreting.statements import AssignmentStatement, ExpressionStatement, Statement
 from os import error
-from parsing.expressions import BinaryExpression, Expression, GroupedExpression, LiteralExpression, UnaryExpression
+from parsing.expressions import BinaryExpression, Expression, GroupedExpression, IdentifierExpression, LiteralExpression, UnaryExpression
 from errors.error import Error, SyntaxError
 from typing import List, Tuple
 from lexing.tokens import Token, TokenType
@@ -54,8 +55,32 @@ class Parser:
     def previous(self) -> Token:
         return self.tokens[self.index - 1]
 
-    def parse(self) -> Tuple[Expression, Error]:
-        return self.expression()
+    def parse(self) -> Tuple[Statement, Error]:
+        return self.statement()
+
+    def statement(self) -> Tuple[Statement, Error]:
+        identifier = self.current_token
+
+        if self.match(TokenType.IDENTIFIER):
+            if self.match(TokenType.EQUALS):
+                expr, error = self.expression()
+                if error:
+                    return None, error
+
+                if not self.match(TokenType.SEMICOLON):
+                    return None, SyntaxError(expr.start_pos, expr.end_pos, "Missing ';'")
+                return AssignmentStatement(expr.start_pos.copy(), expr.end_pos.copy(), identifier, expr), None
+            else:
+                return IdentifierExpression(self.previous().start_pos.copy(), self.current_token.end_pos.copy(), self.previous()), None
+        else:
+            expr, error = self.expression()
+            if error:
+                return None, error
+
+            if not self.match(TokenType.SEMICOLON):
+                return None, SyntaxError(expr.end_pos, expr.end_pos, "Missing ';'")
+
+            return ExpressionStatement(expr.start_pos.copy(), expr.end_pos.copy(), expr), None
 
     def expression(self) -> Tuple[Expression, Error]:
         return self.equality()
@@ -166,5 +191,8 @@ class Parser:
         if self.match_oneof([TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN, TokenType.NULL]):
             prev = self.previous()
             return LiteralExpression(prev.start_pos.copy(), prev.end_pos.set_position(prev.end_pos.line, prev.end_pos.column, prev.end_pos.index).copy(), prev), None
+        elif self.match(TokenType.IDENTIFIER):
+            identifier = self.previous()
+            return IdentifierExpression(identifier.start_pos.copy(), identifier.end_pos.copy(), identifier), None
         else:
             return None, SyntaxError(self.previous().start_pos, self.previous().end_pos, f"Expected literal value but found '{self.previous().value}'")

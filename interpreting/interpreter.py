@@ -1,24 +1,25 @@
+from interpreting.statements import AssignmentStatement, ExpressionStatement, Statement
 from typing import Tuple
 from interpreting.values import Boolean, Number, String, ValueNode
 from lexing.tokens import TokenType
-from parsing.expressions import BinaryExpression, Expression, GroupedExpression, LiteralExpression, UnaryExpression
+from parsing.expressions import BinaryExpression, Expression, GroupedExpression, IdentifierExpression, LiteralExpression, UnaryExpression
 from errors.error import Error, RuntimeError
 
 class Interpreter:
-    def __init__(self, expression: Expression):
-        self.expression = expression
+    def __init__(self):
+        self.globals = dict()
 
-    def interpret(self):
-        return self.visit(self.expression)
+    def interpret(self, statement: Statement) -> Tuple[ValueNode, Error]:
+        return self.visit(statement)
 
-    def visit(self, expression: Expression) -> Tuple[ValueNode, Error]:
-        method_name = f"visit_{expression.__class__.__name__}"
+    def visit(self, statement: Statement) -> Tuple[ValueNode, Error]:
+        method_name = f"visit_{statement.__class__.__name__}"
 
         if hasattr(self, method_name):
             method = getattr(self, method_name)
-            return method(expression)
+            return method(statement)
         
-        return None, RuntimeError(expression.start_pos, expression.end_pos, f"No visit method '{method_name}' implemented.")
+        return None, RuntimeError(statement.start_pos, statement.end_pos, f"No visit method '{method_name}' implemented.")
 
     def visit_LiteralExpression(self, expression: LiteralExpression) -> Tuple[ValueNode, Error]:
         if expression.literal.token_type == TokenType.NUMBER:
@@ -95,6 +96,24 @@ class Interpreter:
 
     def visit_GroupedExpression(self, expression: GroupedExpression) -> Tuple[ValueNode, Error]:
         return self.visit(expression.expression)
+
+    def visit_ExpressionStatement(self, expression: ExpressionStatement) -> Tuple[ValueNode, Error]:
+        return self.visit(expression.expression)
+
+    def visit_IdentifierExpression(self, expression: IdentifierExpression) -> Tuple[ValueNode, Error]:
+        if expression.identifier.value in self.globals:
+            return self.globals[expression.identifier.value], None
+        else:
+            return None, RuntimeError(expression.start_pos, expression.end_pos, f"Identifier {expression.identifier.value} not found in global scope.")
+
+    def visit_AssignmentStatement(self, expression: AssignmentStatement) -> Tuple[ValueNode, Error]:
+        value, error = self.visit(expression.expression)
+        if error:
+            return None, error
+
+        self.globals[expression.identifier.value] = value
+
+        return value, None
 
 
         
